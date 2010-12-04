@@ -1,5 +1,5 @@
 # coding: utf-8
-# ÔËĞĞ»·¾³: python 2.5ÒÔÉÏ, MySQLdbÄ£¿é, mysqlÊı¾İ¿â5.0ÒÔÉÏ
+# è¿è¡Œç¯å¢ƒ: python 2.5ä»¥ä¸Š, MySQLdbæ¨¡å—, mysqlæ•°æ®åº“5.0ä»¥ä¸Š
 
 import sys
 import os
@@ -30,21 +30,21 @@ class FtpIndex:
         else:
             self.startindex('')
             self.ftp.close()
-            self.cur.execute("update ftpinfo set indb=1 where id="+str(self.site['id']))
+            self.cur.execute("update ftpinfo set indb=1 where id="+str(self.site['id'])) 
             self.cur.commit()
             
-    def startindex(self, directory): # directoryÊÇ¾ø¶ÔÂ·¾¶
+    def startindex(self, directory): # directoryæ˜¯ç»å¯¹è·¯å¾„
         print 'indexing %s' % directory
-        if not directory: #¸ùÄ¿Â¼
+        if not directory: #æ ¹ç›®å½•
             self.cur.execute("insert into cat (ipid) values (%s)" % \
                        (self.site['id']))
-        if '/' not in directory: #µÚÒ»²ãÄ¿Â¼
+        if '/' not in directory: #ç¬¬ä¸€å±‚ç›®å½•
             self.cur.execute("select id from cat where cat is null and ipid="+str(self.site['id']))
             pid = self.cur.fetchone()
             self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
                             (directory, pid[0], self.site['id']))
         else:
-            dirs = directory.split('/') #ÇĞÆ¬
+            dirs = directory.split('/') #åˆ‡ç‰‡
             self.cur.execute("select id from cat where cat='"+dirs[-2]+"' and ipid="+str(self.site['id']))
             pid = self.cur.fetchone()
             self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
@@ -52,10 +52,10 @@ class FtpIndex:
         
         for d in self.ftp.nlst(directory):    
             try:
-                if d != self.ftp.nlst(d)[0]: #dÊÇÄ¿Â¼
+                if d != self.ftp.nlst(d)[0]: #dæ˜¯ç›®å½•
                     self.startindex(d)
-                else: #dÊÇÎÄ¼ş
-                    if '/' not in d: #¸ùÄ¿Â¼ÏÂµÄÎÄ¼ş
+                else: #dæ˜¯æ–‡ä»¶
+                    if '/' not in d: #æ ¹ç›®å½•ä¸‹çš„æ–‡ä»¶
                         self.cur.execute("select id from cat where cat is null and ipid="+str(self.site['id']))
                         pid = self.cur.fetchone()
                         self.cur.execute("insert into files (file, postfix, pid, ipid) \
@@ -68,7 +68,7 @@ class FtpIndex:
                         self.cur.execute("insert into files (file, postfix, pid, ipid) \
                             values ('%s', '%s', %s, %s)" % \
                             (dirs[-1], dirs[-1].split('.')[-1], pid[0], self.site['id']))
-            except: #dÊÇ¿ÕÄ¿Â¼
+            except: #dæ˜¯ç©ºç›®å½•
                 pass
    
 
