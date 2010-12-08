@@ -76,4 +76,4 @@ class FtpIndex:
 if __name__ == '__main__':
     ftpindex = FtpIndex()
     ftpindex.fill()
-    
+
