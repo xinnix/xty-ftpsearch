@@ -9,7 +9,7 @@ from ftplib import FTP
 
 class FtpIndex:
     def __init__(self):
-        self.cur = connect(host='localhost', user='root', passwd='xinxin', db='ftpsearch').cursor()
+        self.cur = connect(host='localhost', user='root', passwd='xinxin', db='ftpsearch', charset='utf8').cursor()
         self.querycol = ('id', 'site', 'port', 'user', 'pw')
         
     def fill(self):
