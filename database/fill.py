@@ -31,7 +31,7 @@ class FtpIndex:
             self.startindex('')
             self.ftp.close()
             self.cur.execute("update ftpinfo set indb=1 where id="+str(self.site['id'])) 
-            self.cur.commit()
+            self.cur.execute("commit")
             
     def startindex(self, directory): # directory是绝对路径
         print 'indexing %s' % directory
