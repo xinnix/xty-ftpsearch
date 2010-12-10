@@ -38,7 +38,7 @@ class FtpIndex:
         if not directory: #根目录
             self.cur.execute("insert into cat (ipid) values (%s)" % \
                        (self.site['id']))
-        if '/' not in directory: #第一层目录
+        elif '/' not in directory: #第一层目录
             self.cur.execute("select id from cat where cat is null and ipid="+str(self.site['id']))
             pid = self.cur.fetchone()
             self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
