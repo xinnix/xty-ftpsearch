@@ -54,7 +54,7 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	require_once("./common/db_mysql.class.php");  //调用数据访问类文件
 	$DB = new DB_MySQL;				//创建对象
 	if(count($newstr)==1){					//如果数组的元素个数为1个，则按单个条件进行查询
-			 $sql = "select * from catalog_table,file_table where cat like '%".$newstr[0]."%' or file like '%".$newstr[0]."%'";   //order by id desc "
+			 $sql = "select * from cat,files where cat like '%".$newstr[0]."%' or file like '%".$newstr[0]."%'";   //order by id desc "
 		}
 		else{
 			for($i=0;$i<count($newstr);$i++){      //循环输出目录表中与之匹配的各个关键词
@@ -64,7 +64,7 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 				$sql1.=" file like '%".trim($newstr[$j])."%'"." or";	
 			}
 			$sql1=substr($sql1,0,-2);				//去掉最后一个“or”		
-			$sql="select * from catalog_table,file_table where".$sql0.$sql1;       //形成数据库查询语言
+			$sql="select * from cat,files where".$sql0.$sql1;       //形成数据库查询语言
 			}
   
   $DB->query($sql);      //发送SQL语句到MySQL服务器
@@ -175,7 +175,6 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 			{
 			?>
             下一页&nbsp;&nbsp;最后一页
-            <?php
-			}
-			?>
-	  
+ <?php
+	}
+	?>

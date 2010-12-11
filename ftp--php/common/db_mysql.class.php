@@ -5,9 +5,9 @@
 class DB_MySQL{
 //==========================
 var $Host = "127.0.0.1";			//服务器地址
-var $Database = "db_search";		//数据库名称
+var $Database = "ftpsearch";		//数据库名称
 var $User = "root";					//用户名
-var $Password = "root";				//用户密码
+var $Password = "xinxin";				//用户密码
 //==========================
 var $Link_ID = 0;					//数据库连接	
 var $Query_ID = 0;					//查询结果	
@@ -151,4 +151,4 @@ var $Row_Position = 0;				//记录指针位置索引
 	}
 }
 ?>
-<meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
