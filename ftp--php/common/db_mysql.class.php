@@ -4,7 +4,11 @@
 *********************************************/
 class DB_MySQL{
 //==========================
+<<<<<<< HEAD
 var $Host = "localhost";			//服务器地址
+=======
+var $Host = "127.0.0.1";			//服务器地址
+>>>>>>> 32d37365fff50a099c0501813f914c215b519a01
 var $Database = "ftpsearch";		//数据库名称
 var $User = "root";					//用户名
 var $Password = "xinxin";				//用户密码
@@ -151,4 +155,4 @@ var $Row_Position = 0;				//记录指针位置索引
 	}
 }
 ?>
-<meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
