@@ -21,7 +21,8 @@ if($submit2!=""){						    //在查询结果中查找
 $yuan=trim($keyword);         //获取用户输入的关键词，并去除左右两边空格
 $tt= $yuan;                   //将去除左右空格的关键词赋给变量$tt
 
-$str=gl($tt);                 //对关键词过滤标点符号
+$str1=gl($tt);                 //对关键词过滤标点符号
+$str=gl1($str1);               //过滤标点符号
 
 $sp = new SplitWord();        //创建分词对象
 
@@ -51,10 +52,10 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 		$newstr = explode("、",$cc);			//应用explode()函数将字符串转换成数组
 	
 	
-	require_once("./common/db_mysql.class.php");  //调用数据访问类文件
+	require_once("common/db_mysql.class.php");  //调用数据访问类文件
 	$DB = new DB_MySQL;				//创建对象
 	if(count($newstr)==1){					//如果数组的元素个数为1个，则按单个条件进行查询
-			 $sql = "select * from catalog_table,file_table where cat like '%".$newstr[0]."%' or file like '%".$newstr[0]."%'";   //order by id desc "
+			 $sql = "select * from cat,files where cat like '%".$newstr[0]."%' or file like '%".$newstr[0]."%'";   //order by id desc "
 		}
 		else{
 			for($i=0;$i<count($newstr);$i++){      //循环输出目录表中与之匹配的各个关键词
@@ -64,24 +65,37 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 				$sql1.=" file like '%".trim($newstr[$j])."%'"." or";	
 			}
 			$sql1=substr($sql1,0,-2);				//去掉最后一个“or”		
-			$sql="select * from catalog_table,file_table where".$sql0.$sql1;       //形成数据库查询语言
+			$sql="select * from cat,files where".$sql0.$sql1;       //形成数据库查询语言
 			}
   
   $DB->query($sql);      //发送SQL语句到MySQL服务器
 	$res = $DB->get_rows_array();  //将结果储存在数组中
-	$rows_count=count($res);         //计算结果总数
+	$rows_counts=count($res);         //计算结果总数
 	$time_end = getmicrotime();				//结束计时
 	$t0 = $time_end - $time_start;			//搜索计时
 	?>
 	//////////////////
 	
 	////////////////////利用循坏语句获取输出数据表中各个字段的值
-	<?php                 
-	for($i=0;$i<$rows_count;$i++){
-		$id=$res[$i]['id'];         //获取ID号
-		$title=$res[$i]['title'];      //获取标题
-		$content=$res[$i]['content'];    //获取内容
-	?>
+//	<?php                 
+	//for($i=0;$i<$rows_count;$i++){
+	//	if($res[$i][file]!=NULL)     //输出文件表中所对应的文件名、父目录、站点地址
+	//	{
+	//		 $file=$res[$i]['file'];
+	//		 $pid=$res[$i]['pid'];
+	//		 $ipid=$res[$i]['ipid'];
+	//	} 
+	//	else                        ////输出目录表中所对应的目录名、父目录、站点地址
+	//	{
+	//		 $cat=$res[$i]['cat'];
+	//		 $pid=$res[$i]['pid'];
+	//		 $ipid=$res[$i]['ipid'];
+	//	} 
+		
+		//$id=$res[$i]['id'];         //获取ID号
+		//$title=$res[$i]['title'];      //获取标题
+		//$content=$res[$i]['content'];    //获取内容
+	//?>
 
 ////////////
 		
@@ -95,14 +109,14 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
  //////////汇总匹配的条数，在网页上显示
  //////////需加html标签
 		  <?php
-		  echo $row_count_sum;
+		  echo $rows_counts;
 		  ?>
 ///////////
 		  
  //////////在网页上显示计算搜索的时间
  //////////需加html标签
 		  <?php
-		    echo "用时：$t0秒";
+		    echo "用时：".$t0."秒";
 		    ?>
 ///////////////
 		    
@@ -131,24 +145,76 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	//查询起始行位置
 	$start_row = ($page_num-1) * $row_per_page;
 	//为SQL语句添加limit子句
-	$sql .= " limit $start_row,$row_per_page";
+	$sql.= " limit $start_row,$row_per_page";
 	//执行查询
 	$DB->query($sql);
 	$res = $DB->get_rows_array();
 	//结果集行数
 	$rows_count=count($res);
+	for($i=0;$i<$rows_count;$i++){
+      $result= array();
+      if($res[$i][file]!=NULL)     //输出文件表中所对应的文件名、父目录、站点地址得出完整地址
+	    {
+			 $file=$res[$i]['file'];
+			 $pid=$res[$i]['pid'];
+			 $ipid=$res[$i]['ipid'];
+			 $id1="\\";
+			 while($pid!=0)
+			 {
+			 	$DB->query("select * from cat where id=$pid");
+			 	$result1= $DB->get_rows_array();
+			 	$pid=$result1[0]['pid'];
+			 	$result1[0]['cat'].=$id1;
+			 	$id1="\\".$result1[0]['cat'];
+			 }
+			 $DB->query("select * from ftpinfo where id=$ipid");
+			 $result2= $DB->get_rows_array();
+			 $resukt2[0]['port'].=$id1;
+			 $id1=":".$resukt2[0]['port'];
+			 $resukt2[0]['site'].=$id1;
+			 $id1=$resukt2[0]['site'];
+			 $id1.=$file;
+			 $result[i]=$id1;
+	    } 
+		else                        ////输出目录表中所对应的目录名、父目录、站点地址得出完整地址
+		{
+			 $cat=$res[$i]['cat'];
+			 $pid=$res[$i]['pid'];
+			 $ipid=$res[$i]['ipid'];
+			 $id2="\\";
+			 while($pid!=0)
+			 {
+			 	$DB->query("select * from cat where id=$pid");
+			 	$result1= $DB->get_rows_array();
+			 	$pid=$result1[0]['pid'];
+			 	$result1[0]['cat'].=$id2;
+			 	$id2="\\".$result1[0]['cat'];
+			 }
+			 $DB->query("select * from ftpinfo where id=$ipid");
+			 $result2= $DB->get_rows_array();
+			 $resukt2[0]['port'].=$id2;
+			 $id2=":".$resukt2[0]['port'];
+			 $resukt2[0]['site'].=$id2;
+			 $id2=$resukt2[0]['site'];
+			 $id2.=$cat;
+			 $result[i]=$id2;
+		} 
 	?>
 	/////////
 	
 	/////////对标题中所有符合查询关键词后的词语进行描红和超链接，这里应用循坏语句实现将对搜素搜索结果进行输出
 	/////////需加html标签
 	<?php
+		 	for($i=0;$i<$rows_count;$i++){
 		 	for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
-				 $title= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$title);
+				 $result[i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
 			}
-		   echo chinesesubstr($title,0,80);    //输出标题的前80个字节
-		   if(strlen($title)>80){ echo "...";} //如果长度超过80字节，则输出"..."
-		  ?>
+		 ?>	
+		 <a href="<?php echo $result[i];?>"><?php echo $result[i];?></a>
+			<?php
+			  }	
+			  ?>	
+		  
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////输出“第一页”、“上一页”、“下一页”、“最后一页”文字的超链接

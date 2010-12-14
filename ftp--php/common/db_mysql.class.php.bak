@@ -1,35 +1,35 @@
-<?php
+ï»¿<?php
 /********************************************
-*Êı¾İ¿â·ÃÎÊÀà
+*æ•°æ®åº“è®¿é—®ç±»
 *********************************************/
 class DB_MySQL{
 //==========================
-var $Host = "127.0.0.1";			//·şÎñÆ÷µØÖ·
-var $Database = "db_search";		//Êı¾İ¿âÃû³Æ
-var $User = "root";					//ÓÃ»§Ãû
-var $Password = "root";				//ÓÃ»§ÃÜÂë
+var $Host = "127.0.0.1";			//æœåŠ¡å™¨åœ°å€
+var $Database = "db_search";		//æ•°æ®åº“åç§°
+var $User = "root";					//ç”¨æˆ·å
+var $Password = "root";				//ç”¨æˆ·å¯†ç 
 //==========================
-var $Link_ID = 0;					//Êı¾İ¿âÁ¬½Ó	
-var $Query_ID = 0;					//²éÑ¯½á¹û	
-var $Row_Result = array();			//½á¹û¼¯×é³ÉµÄÊı×é	
-var $Field_Result = array();		//½á¹û¼¯×Ö¶ÎÃû×é³ÉµÄÊı×é
-var $Affected_Rows;					//Ó°ÏìµÄĞĞÊı
-var $Rows;							//½á¹û¼¯ÖĞ¼ÇÂ¼ĞĞÊı
-var $Fields;						//½á¹û¼¯ÖĞ×Ö¶Î¸öÊı
-var $Row_Position = 0;				//¼ÇÂ¼Ö¸ÕëÎ»ÖÃË÷Òı
+var $Link_ID = 0;					//æ•°æ®åº“è¿æ¥	
+var $Query_ID = 0;					//æŸ¥è¯¢ç»“æœ	
+var $Row_Result = array();			//ç»“æœé›†ç»„æˆçš„æ•°ç»„	
+var $Field_Result = array();		//ç»“æœé›†å­—æ®µåç»„æˆçš„æ•°ç»„
+var $Affected_Rows;					//å½±å“çš„è¡Œæ•°
+var $Rows;							//ç»“æœé›†ä¸­è®°å½•è¡Œæ•°
+var $Fields;						//ç»“æœé›†ä¸­å­—æ®µä¸ªæ•°
+var $Row_Position = 0;				//è®°å½•æŒ‡é’ˆä½ç½®ç´¢å¼•
 
 //*******************************************************
-	/*** ¹¹Ôìº¯Êı */
+	/*** æ„é€ å‡½æ•° */
 	function __construct(){
 		$this->connect();
 	}
 
-	/*** ½âÎöº¯Êı */
+	/*** è§£æå‡½æ•° */
 	function __destruct(){
 		mysql_close($this->Link_ID);
 	}
 
-	/*** Á¬½Ó·şÎñÆ÷,Ñ¡ÔñÊı¾İ¿â */
+	/*** è¿æ¥æœåŠ¡å™¨,é€‰æ‹©æ•°æ®åº“ */
 	function connect($Database = "",$Host = "",$User = "",$Password = ""){
 		if ("" == $Database){
 		  $Database = $this->Database;
@@ -49,67 +49,67 @@ var $Row_Position = 0;				//¼ÇÂ¼Ö¸ÕëÎ»ÖÃË÷Òı
 			$this->Link_ID=@mysql_pconnect($Host, $User, $Password);
 			if (!$this->Link_ID) 
 			{
-			$this->halt("Á¬½ÓÊı¾İ¿â·şÎñ¶ËÊ§°Ü!");
+			$this->halt("è¿æ¥æ•°æ®åº“æœåŠ¡ç«¯å¤±è´¥!");
 			}
 			if (!mysql_select_db($this->Database,$this->Link_ID))
 			{
-			$this->halt("²»ÄÜ´ò¿ªÖ¸¶¨µÄÊı¾İ¿â:".$this->Database);
+			$this->halt("ä¸èƒ½æ‰“å¼€æŒ‡å®šçš„æ•°æ®åº“:".$this->Database);
 			}
 		}
 		return $this->Link_ID;
 	}
 
-	/*** ÊÍ·ÅÄÚ´æ */
+	/*** é‡Šæ”¾å†…å­˜ */
 	function free(){
 		if ( @mysql_free_result($this->Query_ID) )
 		unset ($this->Row_Result);
 		$this->Query_ID = 0;
 	}
 
-	/*** Ö´ĞĞ²éÑ¯ */
+	/*** æ‰§è¡ŒæŸ¥è¯¢ */
 	function query($Query_String){
-		/* ÊÍ·ÅÉÏ´Î²éÑ¯Õ¼ÓÃµÄÄÚ´æ */
+		/* é‡Šæ”¾ä¸Šæ¬¡æŸ¥è¯¢å ç”¨çš„å†…å­˜ */
 		if ($this->Query_ID){
 			$this->free();
 		}
 		if(0 == $this->Link_ID){
 			$this->connect();
 		}
-		//ÉèÖÃÖĞÎÄ×Ö·û¼¯
+		//è®¾ç½®ä¸­æ–‡å­—ç¬¦é›†
 		@mysql_query("set names GBK",$this->Link_ID);
 		$this->Query_ID = @mysql_query($Query_String,$this->Link_ID);
 		if (!$this->Query_ID){
-		$this->halt("SQL²éÑ¯Óï¾ä³ö´í: ".$Query_String);
+		$this->halt("SQLæŸ¥è¯¢è¯­å¥å‡ºé”™: ".$Query_String);
 		}
 		return $this->Query_ID;
 	}
 	
-	/*** ½«½á¹û¼¯Ö¸ÕëÖ¸ÏòÖ¸¶¨ĞĞ */
+	/*** å°†ç»“æœé›†æŒ‡é’ˆæŒ‡å‘æŒ‡å®šè¡Œ */
 	function seek($pos){
 		if(@mysql_data_seek($this->Query_ID, $pos)){
 			$this->Row_Position = $pos;
 			return true;
 		}
 		else{
-			$this->halt("¶¨Î»½á¹û¼¯·¢Éú´íÎó!");			//µ÷ÓÃ×Ô¶¨Òåº¯Êı
+			$this->halt("å®šä½ç»“æœé›†å‘ç”Ÿé”™è¯¯!");			//è°ƒç”¨è‡ªå®šä¹‰å‡½æ•°
 			return false;
 		}
 
 	}
 
-	/*** ·µ»Ø½á¹û¼¯¼ÇÂ¼×é³ÉµÄÊı×é */
+	/*** è¿”å›ç»“æœé›†è®°å½•ç»„æˆçš„æ•°ç»„ */
 	function get_rows_array(){
 		$this->get_rows();
 		for($i=0;$i<$this->Rows;$i++){
 			if(!mysql_data_seek($this->Query_ID,$i)){
-				$this->halt("mysql_data_seek²éÑ¯Óï¾ä³ö´í");		//µ÷ÓÃ×Ô¶¨Òåº¯Êı
+				$this->halt("mysql_data_seekæŸ¥è¯¢è¯­å¥å‡ºé”™");		//è°ƒç”¨è‡ªå®šä¹‰å‡½æ•°
 			}
 			$this->Row_Result[$i] = mysql_fetch_array($this->Query_ID);
 		}
 		return $this->Row_Result;
 	}
 
-	/*** ·µ»Ø½á¹û¼¯×Ö¶Î×é³ÉµÄÊı×é */
+	/*** è¿”å›ç»“æœé›†å­—æ®µç»„æˆçš„æ•°ç»„ */
 	function get_fields_array(){
 		$this->get_fields();
 		for($i=0;$i<$this->Fields;$i++){
@@ -119,35 +119,35 @@ var $Row_Position = 0;				//¼ÇÂ¼Ö¸ÕëÎ»ÖÃË÷Òı
 		return $this->Field_Result;
 	}
 
-	/*** ·µ»ØÓ°Ïì¼ÇÂ¼Êı */
+	/*** è¿”å›å½±å“è®°å½•æ•° */
 	function get_affected_rows(){
 		$this->Affected_Rows = mysql_affected_rows($this->Link_ID);
 		return $this->Affected_Rows;
 	}
 
-	/*** ·µ»Ø½á¹û¼¯ÖĞ¼ÇÂ¼ĞĞÊı */
+	/*** è¿”å›ç»“æœé›†ä¸­è®°å½•è¡Œæ•° */
 	function get_rows(){
 		$this->Rows = mysql_num_rows($this->Query_ID); 
 		return $this->Rows;
 	}
 
-	/*** ·µ»Ø½á¹û¼¯ÖĞ×Ö¶Î¸öÊı */
+	/*** è¿”å›ç»“æœé›†ä¸­å­—æ®µä¸ªæ•° */
 	function get_fields(){
 		$this->Fields = mysql_num_fields($this->Query_ID);
 		return $this->Fields;
 	}
 
-	/*** Ö´ĞĞSQLÓï¾ä²¢·µ»ØÓÉ²éÑ¯½á¹ûÖĞµÚÒ»ĞĞ¼ÇÂ¼×é³ÉµÄÊı×é */
+	/*** æ‰§è¡ŒSQLè¯­å¥å¹¶è¿”å›ç”±æŸ¥è¯¢ç»“æœä¸­ç¬¬ä¸€è¡Œè®°å½•ç»„æˆçš„æ•°ç»„ */
 	function fetch_one_array($sql){
 		$this->query($sql);
 		return mysql_fetch_array($this->Query_ID);
 	}
 
-	/*** ´òÓ¡´íÎóĞÅÏ¢ */
+	/*** æ‰“å°é”™è¯¯ä¿¡æ¯ */
 	function halt($msg){
 		$this->Error=mysql_error();
-		printf("<BR><b>Êı¾İ¿â·¢Éú´íÎó:</b> %s<br>\n", $msg);
-		printf("<b>MySQL ·µ»Ø´íÎóĞÅÏ¢:</b> %s <br>\n",	$this->Error);
+		printf("<BR><b>æ•°æ®åº“å‘ç”Ÿé”™è¯¯:</b> %s<br>\n", $msg);
+		printf("<b>MySQL è¿”å›é”™è¯¯ä¿¡æ¯:</b> %s <br>\n",	$this->Error);
 	}
 }
 ?>
