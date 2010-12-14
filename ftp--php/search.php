@@ -241,6 +241,7 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 			{
 			?>
             下一页&nbsp;&nbsp;最后一页
- <?php
-	}
-	?>
+            <?php
+			}
+			?>
+	  
