@@ -1,5 +1,7 @@
 # coding: utf-8
 # 运行环境: python 2.5以上, MySQLdb模块, mysql数据库5.0以上
+# 使用方式: python fill.py [option]
+# -u 更新已经索引的站点
 
 import sys
 import os
@@ -12,6 +14,29 @@ class FtpIndex:
         self.cur = connect(host='localhost', user='root', passwd='xinxin', db='ftpsearch', charset='utf8').cursor()
         self.querycol = ('id', 'site', 'port', 'user', 'pw')
         self.firstdir = []
+
+    def update(self):
+        querystr = 'select %s, %s, %s, %s, %s from ftpinfo where indb=1'% self.querycol
+        self.cur.execute(querystr)
+        result = self.cur.fetchall()
+        for row in result:
+            self.site = dict(zip(self.querycol, row))
+            self.updateonesite()
+
+    def updateonesite(self):
+        self.cur.execute('delete from files where ipid=%s'% self.site['id'])
+        while(True):
+            self.cur.execute('select max(pid) from cat where ipid=%s'% self.site['id'])
+            maxpid = self.cur.fetchone()
+            if maxpid[0] is not None:
+                print 'deleting %s'% maxpid[0]
+                self.cur.execute('delete from cat where pid=%s'% maxpid)
+                #self.cur.execute('commit')
+            else:
+                self.cur.execute('delete from cat where ipid=%s'% self.site['id'])             
+                break
+        self.cur.execute('commit')
+        self.fillonesite()
         
     def fill(self):
         querystr = 'select %s, %s, %s, %s, %s from ftpinfo where indb=0'% self.querycol
@@ -93,7 +118,7 @@ class FtpIndex:
 
             else: # node为文件
                 if '.' in node: # 文件有后缀
-                     # print dirs[-1]
+                    print dirs[-1]
                     self.cur.execute("insert into files (file, postfix, pid, ipid)\
                                     values ('%s', '%s', %s, %s)" % \
                                     (dirs[-1], dirs[-1].split('.')[-1], pid[0], self.site['id']))
@@ -104,5 +129,9 @@ class FtpIndex:
 
 if __name__ == '__main__':
     ftpindex = FtpIndex()
-    ftpindex.fill()
+    if len(sys.argv) == 2:
+        if sys.argv[1] == '-u':
+            ftpindex.update()
+    else:
+        ftpindex.fill()
 
