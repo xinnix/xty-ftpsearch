@@ -7,7 +7,7 @@ class DB_MySQL{
 var $Host = "localhost";			//服务器地址
 var $Database = "ftpsearch";		//数据库名称
 var $User = "root";					//用户名
-var $Password = "xinxin";				//用户密码
+var $Password = "992002";				//用户密码
 //==========================
 var $Link_ID = 0;					//数据库连接	
 var $Query_ID = 0;					//查询结果	
