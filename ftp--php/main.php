@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>搜索</title>
 </head>
 <form name="login" method="post" action="search.php">

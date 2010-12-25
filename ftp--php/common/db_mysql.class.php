@@ -7,7 +7,7 @@ class DB_MySQL{
 var $Host = "localhost";			//服务器地址
 var $Database = "ftpsearch";		//数据库名称
 var $User = "root";					//用户名
-var $Password = "992002";				//用户密码
+var $Password = "xinxin";				//用户密码
 //==========================
 var $Link_ID = 0;					//数据库连接	
 var $Query_ID = 0;					//查询结果	
@@ -76,7 +76,7 @@ var $Row_Position = 0;				//记录指针位置索引
 			$this->connect();
 		}
 		//设置中文字符集
-		@mysql_query("set names GBK",$this->Link_ID);
+		@mysql_query("set names utf8",$this->Link_ID);
 		$this->Query_ID = @mysql_query($Query_String,$this->Link_ID);
 		if (!$this->Query_ID){
 		$this->halt("SQL查询语句出错: ".$Query_String);

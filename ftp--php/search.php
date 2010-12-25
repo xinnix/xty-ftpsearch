@@ -6,7 +6,7 @@
 ///////////////////////////////-->
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
@@ -20,9 +20,9 @@ if($_POST){                        //应用GET方法获取搜索框的关键字
 $yuan=trim($keyword);         //获取用户输入的关键词，并去除左右两边空格
 $tt= $yuan;                   //将去除左右空格的关键词赋给变量$tt
 
-$str=gl($tt);                 //对关键词过滤标点符号
+//$str=gl($tt);                 //对关键词过滤标点符号
 //$str=gl1($str1);               //过滤标点符号
-echo $str;
+//echo $str;
 
 $sp = new SplitWord();        //创建分词对象
 
@@ -31,7 +31,7 @@ $time_start = getmicrotime(); //开始计时，这个是备选项
 //$time_end = getmicrotime();
 //$t0 = $time_end - $time_start;
 //$sp->SplitRMM($str);          //调用分词方法，对关键词进行分词操作
-$tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
+//$tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 
 ?>
 <!--////////////
@@ -60,8 +60,9 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	if(count($newstr)==1){					//如果数组的元素个数为1个，则按单个条件进行查询
 			 $sql1 = "select * from files where file like '%".$newstr[0]."%'";   //order by id desc "
        $sql2 = "select * from cat where cat like '%".$newstr[0]."%'";
+
       }
-	else{
+		else{
 			for($i=0;$i<count($newstr);$i++){      //循环输出目录表中与之匹配的各个关键词
 				$subsql1.=" file like '%".trim($newstr[$i])."%'"." or";	
 				$subsql1=substr($subsql1,0,-2);
@@ -77,10 +78,13 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 			}
   //$time_end = getmicrotime();
   //$t0 = $time_end - $time_start;
+	
+			 echo $sql1.'<br>';
   $DB->query($sql1);      //发送SQL语句到MySQL服务器对files表进行查询
 	$res1 = $DB->get_rows_array();  //将结果储存在数组中
 	$rows_counts1=count($res1);         //计算files表总数
 	//$time_end = getmicrotime();
+	echo $rows_counts1."<br>";
 	//$t0 = $time_end - $time_start;
 	$DB->query($sql2);      //发送SQL语句到MySQL服务器对cat表进行查询
 	$res2 = $DB->get_rows_array();  //将结果储存在数组中
@@ -146,7 +150,7 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	//判断是否为第一页或者最后一页
 	$is_first = (1 == $page_num) ? 1 : 0;
 	$is_last = ($page_num == $page_count) ? 1 : 0;
-	$result=array();
+	$result;
 	$sign;
 	$rows_count3;
 	$rows_count4;
@@ -161,23 +165,26 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 		$DB->query($sql1);
 	  $res= $DB->get_rows_array();
 	  $rows_count3=count($res);
-	  echo $rows_count3;
 	  
-	  
+	echo "一";  
 	  for($i=0;$i<$rows_count3;$i++){
 	     $file=$res[$i]['file'];
 			 $postfix=$res[$i]['postfix'];
 			 $pid=$res[$i]['pid'];
 			 $ipid=$res[$i]['ipid'];
-			 $id1="\\";
+			 $id1='/';
 			 while($pid!=0)
 			 {
 			 	$DB->query("select * from cat where id=$pid");
 			 	$result1= $DB->get_rows_array();
 			 	$pid=$result1[0]['pid'];
-			 	$result1[0]['cat'].=$id1;
-			 	$id1="\\".$result1[0]['cat'];
-			 }
+				if($result1[0]['cat']!=null)
+				{
+					$result1[0]['cat'].=$id1;
+			 		$id1='/'.$result1[0]['cat'];
+
+				}
+			 			 }
 			 $DB->query("select * from ftpinfo where id=$ipid");
 			 $result2= $DB->get_rows_array();
 			 echo $result2[0]['port'];
@@ -185,86 +192,95 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 			 $id1=":".$result2[0]['port'];
 			 $result2[0]['site'].=$id1;
 			 $id1=$result2[0]['site'];
-			 $file.=".".$postfix;
 			 $id1.=$file;
 			 $result[i]=$id1;
+echo $result[1]."happy";
 	    }
 	  
 	 }
-	if($page_num==$page_count1)
+	else if($page_num==$page_count1)
 	{
+		echo "二";
 		$start_row = ($page_num-1) * $row_per_page;
 		$sql1.= " limit $start_row,$row_per_page";
 		$DB->query($sql1);
 	  $res= $DB->get_rows_array();
 	  $rows_count4=count($res);
-	  echo $rows_count4;
 	  
 	  $rows_count5=$row_per_page-$rows_count4;
 	  $sql2.= " limit 0,$rows_count5";
 	  $DB->query($sql2);
 	  $res2= $DB->get_rows_array();
 	  $sign=count($res2);
-	  echo $sign;
 	  $rows_count5=$rows_count4+$sign;
+	  echo $rows_count5."<br>";
 	  
 	  for($i=0;$i<$rows_count5;$i++){
 	    if($i<$rows_count4)
 	    {
+		    echo $i."###########<br>";
 	     $file=$res[$i]['file'];
 			 $postfix=$res[$i]['postfix'];
 			 $pid=$res[$i]['pid'];
 			 $ipid=$res[$i]['ipid'];
-			 $id1="\\";
-			 while($pid!=0)
+			 $id1='/';
+
+			 while($pid!=NULL)
 			 {
 			 	$DB->query("select * from cat where id=$pid");
 			 	$result1= $DB->get_rows_array();
-			 	$pid=$result1[0]['pid'];
-			 	$result1[0]['cat'].=$id1;
-			 	$id1="\\".$result1[0]['cat'];
+				$pid=$result1[0]['pid'];
+				if($result1[0]['cat']!=null){
+					$result1[0]['cat'].=$id1;
+			 		$id1='/'.$result1[0]['cat'];
+			
+				}
 			 }
 			 $DB->query("select * from ftpinfo where id=$ipid");
 			 $result2= $DB->get_rows_array();
-			 echo $result2[0]['port'];
-			 $result2[0]['port'].=$id1;
-			 $id1=":".$result2[0]['port'];
-			 $result2[0]['site'].=$id1;
-			 $id1=$result2[0]['site'];
-			 $file.=".".$postfix;
+			 $tmp=$id1;
+			 //$result2[0]['port'].=$id1;
+			// $id1=":".$result2[0]['port'];
+			// $result2[0]['site'].=$id1;
+			 $id1=$result2[0]['site'].":".$result2[0]['port'].$tmp;
+			 echo $id1."<br>";
 			 $id1.=$file;
-			 $result[i]=$id1;
-	        }
-			 else
+			 $result[$i]="ftp://".$id1;
+			 echo $result[$i]."##test<br>";
+	        } else
 			 {
 			   $cat=$res2[$i-$rows_count4]['cat'];
 			   $pid=$res2[$i-$rows_count4]['pid'];
 			   $ipid=$res2[$i-$rows_count4]['ipid'];
-			   $id2="\\";
-			 while($pid!=0)
+			   $id2='/';
+			 while($pid!=NULL)
 			 {
 			 	$DB->query("select * from cat where id=$pid");
 			 	$result1= $DB->get_rows_array();
 			 	$pid=$result1[0]['pid'];
-			 	$result1[0]['cat'].=$id2;
-			 	$id2="\\".$result1[0]['cat'];
+			 	if($result1[0]['cat']!=null){
+					$result1[0]['cat'].=$id22;
+			 		$id2='/'.$result1[0]['cat'];
+			
+				}
+			 	
 			 }
 			 $DB->query("select * from ftpinfo where id=$ipid");
 			 $result2= $DB->get_rows_array();
-			 echo $result2[0]['port'];
 			 $result2[0]['port'].=$id2;
 			 $id2=":".$result2[0]['port'];
 			 $result2[0]['site'].=$id2;
 			 $id2=$result2[0]['site'];
 			 $id2.=$cat;
-			 $result[i]=$id2;
+			 $result[i]="ftp://".$id2;
+
 			 }
 
 	  }
-	  
 	}
-	 if($page_num>$page_count1)
+	else if($page_num>$page_count1)
 	{
+		echo "三";
 	  $start_row = ($page_num-$page_count1-1) * $row_per_page+$sign;
 	  $sql2.= " limit $start_row,$row_per_page";
 		$DB->query($sql2);
@@ -276,24 +292,28 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	    $cat=$res[$i]['cat'];
 			 $pid=$res[$i]['pid'];
 			 $ipid=$res[$i]['ipid'];
-			 $id2="\\";
+			 $id2='/';
 			 while($pid!=0)
 			 {
 			 	$DB->query("select * from cat where id=$pid");
 			 	$result1= $DB->get_rows_array();
 			 	$pid=$result1[0]['pid'];
-			 	$result1[0]['cat'].=$id2;
-			 	$id2="\\".$result1[0]['cat'];
-			 }
+				if($result1[0]['cat']!=null)
+				{
+					$result1[0]['cat'].=$id2;
+			 		$id2='/'.$result1[0]['cat'];
+
+
+				}
+			 			 }
 			 $DB->query("select * from ftpinfo where id=$ipid");
 			 $result2= $DB->get_rows_array();
-			 echo $result2[0]['port'];
 			 $result2[0]['port'].=$id2;
 			 $id2=":".$result2[0]['port'];
 			 $result2[0]['site'].=$id2;
 			 $id2=$result2[0]['site'];
 			 $id2.=$cat;
-			 $result[i]=$id2;
+			 $result[i]="ftp://".$id2;
 	  }
 	}  
 
@@ -303,42 +323,55 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 	/////////对标题中所有符合查询关键词后的词语进行描红和超链接，这里应用循坏语句实现将对搜素搜索结果进行输出
 	/////////需加html标签-->
 	<?php
-		 	if($page_num<$page_count1)
-		 	{
+		 	if($page_num<$page_count1){
+				echo "hello1";
+				echo $result[0];
+					echo $result[1];	
+
+		 	
 		 	 for($i=0;$i<$rows_count3;$i++){
 		 	 for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
-				 $result[i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
+				 $href=$result[$i];
+				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
+
 			 }
 		 ?>	
-		 <a href="<?php echo $result[i];?>"><?php echo $result[i];?></a>
+		 <a href="<?php echo $href;?>"><?php echo $result[i];?></a>
 			<?php
 			  }
-			}	
+			}
 			  ?>
 			  <?php
-	      if($page_num==$page_count1)
-		 	{
+	if($page_num==$page_count1)
+	{
+		print_r($result);
+		echo "hello 2";
 		 	 for($i=0;$i<$rows_count5;$i++){
-		 	 
-		 	 for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
-				 $result[i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
-			 }
+				 
+				 $href=$result[$i];
+		 	 for($n=0;$n<count($newstr);$n++)   //应用FOR循环语句对分词后的词语进行描红
+				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[$i]);
+
 		 ?>	
-		 <a href="<?php echo $result[i];?>"><?php echo $result[i];?></a>
+		 <a href="<?php echo $href;?>"><?php echo $result[$i];?></a><br>
 			<?php  
 			}
-		}	
+	}	
 			  ?>
 			  <?php
-	      if($page_num>$page_count1)
-		 	{
+			if($page_num>$page_count1)
+			{
+				echo "hello3";
+				echo $result[1];
+					echo $result[1];
 		 	 for($i=0;$i<$rows_count6;$i++){
 		 	 
 		 	 for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
-				 $result[i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
+				$href=$result[$i];
+				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
 			 }
 		 ?>	
-		 <a href="<?php echo $result[i];?>"><?php echo $result[i];?></a>
+		 <a href="<?php echo $href;?>"><?php echo $result[i];?></a><br>
 			<?php  
 			}
 		}	
@@ -350,8 +383,8 @@ $tt=$sp->SplitRMM($str);      //将分词后的结果赋给变量$tt
 <?php
 			if(!$is_first){
 			?>
-      <a href="./search.php?page_num=1&keyword=<?php echo $keyword;?>">第一页</a> 
-      <a href="./search.php?page_num=<?php echo ($page_num-1); ?>&keyword=<?php echo $keyword;?>">上一页</a>
+      <a href="./search.php?page_num=1&keyword=<?php echo $keyword;?>">第一页</a> <br>
+      <a href="./search.php?page_num=<?php echo ($page_num-1); ?>&keyword=<?php echo $keyword;?>">上一页</a><br>
             <?php
 			}
 			else{
