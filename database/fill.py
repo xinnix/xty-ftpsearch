@@ -5,8 +5,11 @@
 
 import sys
 import os
-from MySQLdb import *
 from ftplib import FTP
+from mimetypes import guess_type
+
+from MySQLdb import *
+
 
 
 class FtpIndex:
@@ -66,6 +69,7 @@ class FtpIndex:
     def indexroot(self):
         self.cur.execute("insert into cat (ipid) values (%s)" % self.site['id'])
         for node in self.ftp.nlst():
+            node = node.replace("'", "\\'")
             subnode = self.ftp.nlst(node)
             self.cur.execute("select id from cat where cat is null and ipid=%s" % self.site['id'])
             pid = self.cur.fetchone()
@@ -85,9 +89,15 @@ class FtpIndex:
                 
             else: # node为文件
                 if '.' in node: # 文件有后缀
-                    self.cur.execute("insert into files (file, postfix, pid, ipid)\
-                                    values ('%s', '%s', %s, %s)" % \
-                                    (node, node.split('.')[-1], pid[0], self.site['id']))
+                    filetype = guess_type(node)[0]
+                    if filetype is not None:
+                        self.cur.execute("insert into files (file, postfix, pid, ipid, type)\
+                                        values ('%s', '%s', %s, %s, '%s')" % \
+                                        (node, node.split('.')[-1], pid[0], self.site['id'], filetype))
+                    else:
+                        self.cur.execute("insert into files (file, postfix, pid, ipid)\
+                                        values ('%s', '%s', %s, %s)" % \
+                                        (node, node.split('.')[-1], pid[0], self.site['id']))
                 else: 
                     self.cur.execute("insert into files (file, pid, ipid)\
                                     values ('%s', %s, %s)" % \
@@ -102,30 +112,37 @@ class FtpIndex:
             dirs = node.split('/') #切片
             self.cur.execute("select id from cat where cat='%s' and ipid=%s" % (dirs[-2], self.site['id']))
             pid = self.cur.fetchone()
+            filename = dirs[-1].replace("'", "\\'")
             if len(subnode) == 0: # node为空目录
                 self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
-                                (dirs[-1], pid[0], self.site['id']))
+                                (filename, pid[0], self.site['id']))
 
             elif len(subnode) > 1: # node为多文件目录
                 self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
-                                (dirs[-1], pid[0], self.site['id']))
+                                (filename, pid[0], self.site['id']))
                 self.indexsubnode(node)
 
             elif subnode[0] != node: # node为单文件目录
                 self.cur.execute("insert into cat (cat, pid, ipid) values ('%s', %s, %s)" % \
-                                 (dirs[-1], pid[0], self.site['id']))
+                                 (filename, pid[0], self.site['id']))
                 self.indexsubnode(node)
 
             else: # node为文件
                 if '.' in node: # 文件有后缀
                     print dirs[-1]
-                    self.cur.execute("insert into files (file, postfix, pid, ipid)\
-                                    values ('%s', '%s', %s, %s)" % \
-                                    (dirs[-1], dirs[-1].split('.')[-1], pid[0], self.site['id']))
+                    filetype = guess_type(dirs[-1])[0]
+                    if filetype is not None:
+                        self.cur.execute("insert into files (file, postfix, pid, ipid, type)\
+                                        values ('%s', '%s', %s, %s, '%s')" % \
+                                        (filename, filename.split('.')[-1], pid[0], self.site['id'], filetype))
+                    else:
+                        self.cur.execute("insert into files (file, postfix, pid, ipid)\
+                                        values ('%s', '%s', %s, %s)" % \
+                                        (filename, filename.split('.')[-1], pid[0], self.site['id']))
                 else: 
                     self.cur.execute("insert into files (file, pid, ipid)\
                                     values ('%s', %s, %s)" % \
-                                    (dirs[-1], pid[0], self.site['id']))
+                                    (filename, pid[0], self.site['id']))
 
 if __name__ == '__main__':
     ftpindex = FtpIndex()
