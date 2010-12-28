@@ -7,6 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="css/search.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -15,7 +16,6 @@ require("splitword.php");         //调用分词类文件
 require("common/function.php");   //调用自定义函数文件
 if($_POST){                        //应用GET方法获取搜索框的关键字
    $keyword=$_POST[keyword];
-    echo $keyword;
 }
 $yuan=trim($keyword);         //获取用户输入的关键词，并去除左右两边空格
 $tt= $yuan;                   //将去除左右空格的关键词赋给变量$tt
@@ -52,7 +52,6 @@ $time_start = getmicrotime(); //开始计时，这个是备选项
 		$cc= substr($a,0,-2);		//去掉后面的“、”符号
 	}
 	$newstr = explode("、",$cc);			//应用explode()函数将字符串转换成数组
-	echo $newstr[0];
 	
 	
   require_once("common/db_mysql.class.php");  //调用数据访问类文件
@@ -79,50 +78,47 @@ $time_start = getmicrotime(); //开始计时，这个是备选项
   //$time_end = getmicrotime();
   //$t0 = $time_end - $time_start;
 	
-			 echo $sql1.'<br>';
   $DB->query($sql1);      //发送SQL语句到MySQL服务器对files表进行查询
 	$res1 = $DB->get_rows_array();  //将结果储存在数组中
 	$rows_counts1=count($res1);         //计算files表总数
 	//$time_end = getmicrotime();
-	echo $rows_counts1."<br>";
 	//$t0 = $time_end - $time_start;
 	$DB->query($sql2);      //发送SQL语句到MySQL服务器对cat表进行查询
 	$res2 = $DB->get_rows_array();  //将结果储存在数组中
 	$rows_counts2=count($res2);         //计算cat表总数
 	
-	//$rows_counts=$rows_counts1+$rows_counts2；//计算搜索总条数
+	//$rows_counts=$rows_counts1+$rows_counts2;//计算搜索总条数
 	$time_end = getmicrotime();
 	$t0 = $time_end - $time_start;
 	
-	$rows_counts=$rows_counts1+$rows_counts2；//计算搜索总条数
+	$rows_counts=$rows_counts1+$rows_counts2;//计算搜索总条数
 	
 	//$time_end = getmicrotime();				//结束计时
 	//$t0 = $time_end - $time_start;			//搜索计时
-	//echo $rows_counts;
-	//echo $t0;
 
 	?>
 <!--	///////////在网页上显示您查找的关键词
 //////////需加html标签-->
+<div id="title">
 		<?php
-		  echo $keyword;
+		  echo "关键词：".$keyword."  ";
 		  ?>
 <!--///////////
 		  
  //////////汇总匹配的条数，在网页上显示
  //////////需加html标签-->
 		  <?php
-		  echo $rows_counts;
+		  echo "显示结果".$rows_counts."条    ";
 		  ?>
 <!--///////////
 		  
  //////////在网页上显示计算搜索的时间
  //////////需加html标签-->
 		  <?php
-		    echo "用时：".$t0."秒";
+		    echo "用时：".$t0."秒"."<br>";
 		    ?>
+	</div>    
 		   <!--///////////////
-		    
 //////////////以分页的形式输出符合条件的信息给用户-->
 		    <?php
 	if($_GET){
@@ -166,7 +162,6 @@ $time_start = getmicrotime(); //开始计时，这个是备选项
 	  $res= $DB->get_rows_array();
 	  $rows_count3=count($res);
 	  
-	echo "一";  
 	  for($i=0;$i<$rows_count3;$i++){
 	     $file=$res[$i]['file'];
 			 $postfix=$res[$i]['postfix'];
@@ -193,14 +188,12 @@ $time_start = getmicrotime(); //开始计时，这个是备选项
 			 $result2[0]['site'].=$id1;
 			 $id1=$result2[0]['site'];
 			 $id1.=$file;
-			 $result[i]=$id1;
-echo $result[1]."happy";
+			 $result[$i]=$id1;
 	    }
 	  
 	 }
 	else if($page_num==$page_count1)
 	{
-		echo "二";
 		$start_row = ($page_num-1) * $row_per_page;
 		$sql1.= " limit $start_row,$row_per_page";
 		$DB->query($sql1);
@@ -213,12 +206,10 @@ echo $result[1]."happy";
 	  $res2= $DB->get_rows_array();
 	  $sign=count($res2);
 	  $rows_count5=$rows_count4+$sign;
-	  echo $rows_count5."<br>";
 	  
 	  for($i=0;$i<$rows_count5;$i++){
 	    if($i<$rows_count4)
 	    {
-		    echo $i."###########<br>";
 	     $file=$res[$i]['file'];
 			 $postfix=$res[$i]['postfix'];
 			 $pid=$res[$i]['pid'];
@@ -243,10 +234,8 @@ echo $result[1]."happy";
 			// $id1=":".$result2[0]['port'];
 			// $result2[0]['site'].=$id1;
 			 $id1=$result2[0]['site'].":".$result2[0]['port'].$tmp;
-			 echo $id1."<br>";
 			 $id1.=$file;
 			 $result[$i]="ftp://".$id1;
-			 echo $result[$i]."##test<br>";
 	        } else
 			 {
 			   $cat=$res2[$i-$rows_count4]['cat'];
@@ -272,7 +261,7 @@ echo $result[1]."happy";
 			 $result2[0]['site'].=$id2;
 			 $id2=$result2[0]['site'];
 			 $id2.=$cat;
-			 $result[i]="ftp://".$id2;
+			 $result[$i]="ftp://".$id2;
 
 			 }
 
@@ -280,13 +269,11 @@ echo $result[1]."happy";
 	}
 	else if($page_num>$page_count1)
 	{
-		echo "三";
 	  $start_row = ($page_num-$page_count1-1) * $row_per_page+$sign;
 	  $sql2.= " limit $start_row,$row_per_page";
 		$DB->query($sql2);
 	  $res= $DB->get_rows_array();
 	  $rows_count6=count($res);
-	  echo $rows_count6;
 	  
 	  for($i=0;$i<$rows_count6;$i++){
 	    $cat=$res[$i]['cat'];
@@ -313,7 +300,7 @@ echo $result[1]."happy";
 			 $result2[0]['site'].=$id2;
 			 $id2=$result2[0]['site'];
 			 $id2.=$cat;
-			 $result[i]="ftp://".$id2;
+			 $result[$i]="ftp://".$id2;
 	  }
 	}  
 
@@ -322,21 +309,20 @@ echo $result[1]."happy";
 	
 	/////////对标题中所有符合查询关键词后的词语进行描红和超链接，这里应用循坏语句实现将对搜素搜索结果进行输出
 	/////////需加html标签-->
+	<div id="content">
+<ul>
 	<?php
 		 	if($page_num<$page_count1){
-				echo "hello1";
-				echo $result[0];
-					echo $result[1];	
 
 		 	
 		 	 for($i=0;$i<$rows_count3;$i++){
 		 	 for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
 				 $href=$result[$i];
-				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
+				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[$i]);
 
 			 }
 		 ?>	
-		 <a href="<?php echo $href;?>"><?php echo $result[i];?></a>
+<li>		 <a href="<?php echo $href;?>"><?php echo $result[$i];?></a></li>
 			<?php
 			  }
 			}
@@ -344,8 +330,6 @@ echo $result[1]."happy";
 			  <?php
 	if($page_num==$page_count1)
 	{
-		print_r($result);
-		echo "hello 2";
 		 	 for($i=0;$i<$rows_count5;$i++){
 				 
 				 $href=$result[$i];
@@ -353,7 +337,7 @@ echo $result[1]."happy";
 				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[$i]);
 
 		 ?>	
-		 <a href="<?php echo $href;?>"><?php echo $result[$i];?></a><br>
+<li>		 <a href="<?php echo $href;?>"><?php echo $result[$i];?></a><br></li>
 			<?php  
 			}
 	}	
@@ -361,25 +345,25 @@ echo $result[1]."happy";
 			  <?php
 			if($page_num>$page_count1)
 			{
-				echo "hello3";
 				echo $result[1];
 					echo $result[1];
 		 	 for($i=0;$i<$rows_count6;$i++){
 		 	 
 		 	 for($n=0;$n<count($newstr);$n++){   //应用FOR循环语句对分词后的词语进行描红
 				$href=$result[$i];
-				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[i]);
+				 $result[$i]= str_ireplace($newstr[$n],"<font color='#FF0000'>".$newstr[$n]."</font>",$result[$i]);
 			 }
 		 ?>	
-		 <a href="<?php echo $href;?>"><?php echo $result[i];?></a><br>
+		<li> <a href="<?php echo $href;?>"><?php echo $result[$i];?></a><br></li>
 			<?php  
 			}
 		}	
-			  ?>
-			  <!--/////////////////////////////////////////////////////////////////////////////////////////
-
-//////////////////输出“第一页”、“上一页”、“下一页”、“最后一页”文字的超链接
+?>
+</ul>
+ </div>
+<!--///////////////////////////////////////////////////////////////////////////////////////// //////////////////输出“第一页”、“上一页”、“下一页”、“最后一页”文字的超链接
 /////////////////需加html标签-->
+<div id="nav">
 <?php
 			if(!$is_first){
 			?>
@@ -405,5 +389,6 @@ echo $result[1]."happy";
             <?php
 			}
 			?>
+</div>
 	</body>
 </html>
