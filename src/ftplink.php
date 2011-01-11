@@ -3,17 +3,18 @@
  * 目前实现了获取目录结构，但是返回的是数组，没有进行字符串分析
  */
 class Ftplink{
-	var $ftpadd="ftp.seu.edu.cn";
+	var $ftpadd="127.0.0.1";
 	var $usrname="anonymous";
 	var	$password="";
 	function getlist()
 	{
 
 		$conn= ftp_connect($this->ftpadd) or die("Could not connect");
-		ftp_login($conn,$this->usrname,$this->password);
+	echo	ftp_login($conn,$this->usrname,$this->password);
+echo '2';		
 		$list=ftp_rawlist($conn,".",true);
 		ftp_close($conn);
-		return $list;
+		print_r($list);
 
 	}
 	/*private*/ function connect_ftp($ip)
@@ -42,5 +43,5 @@ class Ftplink{
 	
 }
 $ll=new Ftplink;
-$ll->searchftp("192.168.0.1","192.168.0.20","255.255.255.0");
+$ll->getlist();
 ?>

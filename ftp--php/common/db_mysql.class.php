@@ -65,6 +65,12 @@ var $Row_Position = 0;				//记录指针位置索引
 		unset ($this->Row_Result);
 		$this->Query_ID = 0;
 	}
+	function insert($Insert_String)
+	{
+
+
+	}
+
 
 	/*** 执行查询 */
 	function query($Query_String){
@@ -151,4 +157,3 @@ var $Row_Position = 0;				//记录指针位置索引
 	}
 }
 ?>
-<meta http-equiv="Content-Type" content="text/html; charset=GBK">
