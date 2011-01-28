@@ -1,0 +1,35 @@
+body{
+	text-decoration: none;
+	text-align: center;
+}
+A:link {font-size:14px;COLOR: #0a6b3c;TEXT-DECORATION: none;}
+A:visited {font-size:14px;COLOR: #0a6b3c;TEXT-DECORATION: none;}
+A:hover {font-size:14px;COLOR: red;TEXT-DECORATION: none;}
+A:active {font-size:14px;COLOR: #0a6b3c;TEXT-DECORATION: none;}
+
+.link{
+	float: left
+}
+#content{
+	margin-top:50px;
+}
+.textfield input{
+	height:30px;
+}
+.logo{
+	height:198px;
+	margin-left: auto;
+	margin-right: auto;
+	width:481px;
+	background:url(../images/logo.jpg);
+}
+#search{
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+}
+#introduce{
+	margin-top: 50px;
+	text-align: left;
+	padding-left:550px;
+}
